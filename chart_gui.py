@@ -101,7 +101,7 @@ entry_values.pack()
 ttk.Label(root, text="Chart Type:").pack()
 chart_type_var = tk.StringVar(root)
 chart_type_var.set("bar")
-ttk.OptionMenu(root, chart_type_var, "bar", "pie", "line").pack()
+ttk.OptionMenu(root, chart_type_var, "bar", "bar", "pie", "line").pack()
 
 # Optional Fields
 ttk.Label(root, text="Chart Title (optional):").pack()
