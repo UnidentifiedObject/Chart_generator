@@ -8,6 +8,8 @@ from tkinter import ttk
 current_fig = None
 selected_color = None  # Store user-selected color
 
+
+
 def choose_color():
     global selected_color
     color = colorchooser.askcolor(title="Choose Chart Color")[1]  # [1] returns hex
@@ -20,6 +22,8 @@ def generate_chart():
 
     categories_input = entry_categories.get()
     values_input = entry_values.get()
+    values_input_2 = entry_values_2.get().strip()  # NEW
+    label_2 = entry_label_2.get().strip() or "Dataset 2"  # NEW
     chart_type = chart_type_var.get().lower()
 
     title = entry_title.get()
@@ -39,15 +43,41 @@ def generate_chart():
         messagebox.showerror("Input Error", "Values must be numbers.")
         return
 
+    label_1 = entry_label_1.get().strip() or "Dataset 1"
+
+    datasets = [
+        {
+            "label": label_1,
+            "values": values_float,
+            "color": selected_color
+        }
+    ]
+
+    
+    if values_input_2:
+        values_2 = [item.strip() for item in values_input_2.split(',')]
+        if len(values_2) != len(categories):
+            messagebox.showerror("Input Error", "Second values must match the number of categories.")
+            return
+        try:
+            values_2_float = [float(v) for v in values_2]
+        except ValueError:
+            messagebox.showerror("Input Error", "Second values must be numbers.")
+            return
+        datasets.append({
+            "label": label_2,
+            "values": values_2_float,
+            "color": None  
+        })
+
     try:
         fig = create_chart(
             categories,
-            values_float,
+            datasets,
             chart_type,
             title=title if title else None,
             xlabel=xlabel if xlabel else None,
             ylabel=ylabel if ylabel else None,
-            color=selected_color
         )
     except ValueError as e:
         messagebox.showerror("Chart Error", str(e))
@@ -98,7 +128,21 @@ ttk.Label(root, text="Values (comma-separated):").pack()
 entry_values = ttk.Entry(root, width=50)
 entry_values.pack()
 
-ttk.Label(root, text="Chart Type:").pack()
+ttk.Label(root, text="Second Values (optional, comma-separated):").pack()
+entry_values_2 = ttk.Entry(root, width=50)
+entry_values_2.pack()
+
+ttk.Label(root, text="Label for First Dataset (optional):").pack()
+entry_label_1 = ttk.Entry(root, width=50)
+entry_label_1.pack()
+
+
+ttk.Label(root, text="Label for Second Dataset (optional):").pack()
+entry_label_2 = ttk.Entry(root, width=50)
+entry_label_2.pack()
+
+
+tk.Label(root, text="Chart Type:").pack()
 chart_type_var = tk.StringVar(root)
 chart_type_var.set("bar")
 ttk.OptionMenu(root, chart_type_var, "bar", "bar", "pie", "line").pack()
@@ -133,3 +177,4 @@ def on_closing():
 
 root.protocol("WM_DELETE_WINDOW", on_closing)
 root.mainloop()
+
